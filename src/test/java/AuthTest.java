@@ -1,3 +1,6 @@
+import io.qameta.allure.Flaky;
+import io.qameta.allure.Owner;
+import io.qameta.allure.Story;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,8 +13,10 @@ import java.util.stream.Stream;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
+import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+@Owner("npolly")
 public class AuthTest {
 
     @BeforeEach
@@ -24,6 +29,7 @@ public class AuthTest {
     }
 
     @Test
+    @Story("Авторизация")
     @DisplayName("Успешная авторизация")
     public void shouldAuthorizeTest() {
         //3. Заполнить инпуты логина и пароля
@@ -44,14 +50,19 @@ public class AuthTest {
     @ParameterizedTest(name = "{displayName} {0}")
     @DisplayName("Авторизация с некорректными данными:")
     public void shouldNotAuthorizeTest(String type, String phone, String password){
-        $("[id='login_field']")
-                .sendKeys(phone);
-        $("[id='password']")
-                .sendKeys(password);
-        $(".js-sign-in-button")
-                .click();
-        $(".flash.flash-full.flash-error")
-                .shouldBe(visible);
+        step("Заполнить поля инпута и пароля и нажать кнопку авторизации", () -> {
+            $("[id='login_field']")
+                    .sendKeys(phone);
+            $("[id='password']")
+                    .sendKeys(password);
+            $(".js-sign-in-button")
+                    .click();
+        });
+
+        step("Проверить, что появилась ошибка", () -> {
+            $(".flash.flash-full.flash-error")
+                    .shouldBe(visible);
+        });
     }
 
     static Stream<Arguments> incorrectCredentials() {
