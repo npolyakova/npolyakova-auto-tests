@@ -9,3 +9,4 @@ public class ProfileTest {
         TestPages.mainPage.mainSignInButton().click();
     }
 }
+
